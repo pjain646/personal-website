@@ -77,20 +77,9 @@ if (reduceMotion) {
       element.style.setProperty('--reveal-delay', `${index * 90}ms`);
     });
   });
-  document.querySelectorAll('.hero .reveal').forEach((element, index) => {
-    element.style.setProperty('--reveal-delay', `${index * 90}ms`);
-  });
   const projectPreview = document.querySelector('.project-preview.reveal');
   if (projectPreview) projectPreview.style.setProperty('--reveal-delay', '160ms');
   const heroReveals = new Set(document.querySelectorAll('.hero .reveal'));
-  let heroStarted = false;
-  const startHero = () => {
-    if (heroStarted) return;
-    heroStarted = true;
-    heroReveals.forEach(element => element.classList.add('visible'));
-  };
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(startHero);
-  setTimeout(startHero, 700);
   const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
     if (!entry.isIntersecting) return;
     entry.target.classList.add('visible');
