@@ -2,7 +2,6 @@ const header = document.querySelector('.site-header');
 const nav = document.querySelector('#site-nav');
 const toggle = document.querySelector('.menu-toggle');
 const signal = document.querySelector('#signal-field');
-const longhorn = document.querySelector('#longhorn-reveal');
 const reticle = document.querySelector('#cursor-reticle');
 
 if (reticle && matchMedia('(hover: hover) and (pointer: fine)').matches) {
@@ -57,15 +56,9 @@ if (matchMedia('(hover: hover)').matches) {
     signal.style.setProperty('--y', `${y}%`);
     signal.style.setProperty('--glow-radius', '330px');
     signal.style.setProperty('--signal', Math.max(.2, velocity / 28));
-    if (longhorn) {
-      const markRect = longhorn.getBoundingClientRect();
-      longhorn.style.setProperty('--mark-x', `${((event.clientX - markRect.left) / markRect.width) * 100}%`);
-      longhorn.style.setProperty('--mark-y', `${((event.clientY - markRect.top) / markRect.height) * 100}%`);
-      longhorn.style.setProperty('--mark-radius', `${92 + velocity * 2.4}px`);
-    }
     signal.querySelectorAll('.hero-words span').forEach((word, index) => word.style.setProperty('--shift', `${(x - 50) * (index - 1) * .12}px`));
   });
-  signal.addEventListener('pointerleave', () => { signal.style.setProperty('--x', '50%'); signal.style.setProperty('--y', '50%'); signal.style.setProperty('--signal', 0); signal.style.setProperty('--glow-radius', '0px'); if (longhorn) { longhorn.style.setProperty('--mark-x', '50%'); longhorn.style.setProperty('--mark-y', '50%'); longhorn.style.setProperty('--mark-radius', '0px'); } });
+  signal.addEventListener('pointerleave', () => { signal.style.setProperty('--x', '50%'); signal.style.setProperty('--y', '50%'); signal.style.setProperty('--signal', 0); signal.style.setProperty('--glow-radius', '0px'); });
 }
 
 document.querySelectorAll('.project').forEach(project => {

@@ -64,3 +64,25 @@
 
 /* Each work row gets a small visual cue for the kind of work it represents. */
 .thread-entry{grid-template-columns:60px minmax(0,1fr) minmax(240px,280px)}.thread-side{display:flex;align-items:center;justify-content:flex-end;gap:18px;min-width:0}.thread-side .thread-role{white-space:nowrap}.thread-visual{width:58px;height:28px;position:relative;display:block;flex:none;opacity:.42;transition:opacity .25s}.thread-visual:before{content:"";position:absolute;left:6px;right:6px;top:50%;height:1px;background:var(--line);transition:background .25s}.thread-visual i{position:absolute;z-index:1;width:7px;height:7px;border:1px solid var(--muted);background:var(--bg);transition:transform .28s,border-color .25s,background .25s}.thread-visual i:nth-child(1){left:4px;top:10px}.thread-visual i:nth-child(2){left:25px;top:10px}.thread-visual i:nth-child(3){right:4px;top:10px}.thread-entry:hover .thread-visual,.thread-entry.active .thread-visual{opacity:1}.thread-entry:hover .thread-visual:before,.thread-entry.active .thread-visual:before{background:var(--accent)}.thread-entry:hover .thread-visual i,.thread-entry.active .thread-visual i{border-color:var(--accent);background:var(--accent)}.thread-visual.system i{border-radius:50%}.thread-entry:hover .system i:nth-child(1){transform:translateY(-5px)}.thread-entry:hover .system i:nth-child(3){transform:translateY(5px)}.thread-visual.agent i{border-radius:50%;width:9px;height:9px;top:9px}.thread-visual.agent i:nth-child(1){left:7px}.thread-visual.agent i:nth-child(2){left:25px;transform:scale(1.5)}.thread-visual.agent i:nth-child(3){right:7px}.thread-entry:hover .agent i:nth-child(2){transform:scale(1.9);box-shadow:0 0 0 4px rgba(224,107,26,.14)}.thread-visual.production:before{top:4px;bottom:4px;left:8px;right:8px;height:auto;background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 16px)}.thread-visual.production i{width:11px;height:16px;top:6px}.thread-visual.production i:nth-child(1){left:4px}.thread-visual.production i:nth-child(2){left:24px}.thread-visual.production i:nth-child(3){right:4px}.thread-entry:hover .production i{transform:translateY(-3px)}.thread-visual.discovery i{width:11px;height:11px;top:8px;transform:rotate(45deg)}.thread-visual.discovery i:nth-child(1){left:4px}.thread-visual.discovery i:nth-child(2){left:24px}.thread-visual.discovery i:nth-child(3){right:4px}.thread-entry:hover .discovery i:nth-child(2){transform:rotate(45deg) scale(1.5)}.thread-visual.community:before{left:16px;right:16px;width:26px;height:26px;top:1px;border:1px solid var(--line);border-radius:50%;background:none}.thread-visual.community i{border-radius:50%}.thread-visual.community i:nth-child(1){left:6px;top:11px}.thread-visual.community i:nth-child(2){left:25px;top:1px}.thread-visual.community i:nth-child(3){right:6px;top:11px}.thread-entry:hover .community i:nth-child(1){transform:translate(-3px,3px)}.thread-entry:hover .community i:nth-child(3){transform:translate(3px,3px)}@media(max-width:720px){.thread-entry{grid-template-columns:28px 1fr}.thread-side{grid-column:2;justify-content:flex-start}.thread-visual{display:none}}
+
+/* Hero signal pulse: restrained amber grid breath + soft scan (no Longhorn). */
+@property --pulse{syntax:"<number>";inherits:false;initial-value:0}
+.longhorn-reveal{display:none!important}
+.signal-pulse{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.signal-scan{position:absolute;left:-8%;right:-8%;height:42px;top:-42px;background:linear-gradient(180deg,transparent,rgba(224,107,26,.07),transparent);box-shadow:0 0 28px rgba(224,107,26,.05);animation:signalScan 11s ease-in-out infinite}
+.signal-field{--pulse:0;background-image:linear-gradient(rgba(58,54,49,calc(.28 + var(--pulse)*.12)) 1px,transparent 1px),linear-gradient(90deg,rgba(58,54,49,calc(.28 + var(--pulse)*.12)) 1px,transparent 1px),radial-gradient(circle var(--glow-radius) at var(--x) var(--y),var(--accent-wash),transparent 70%),radial-gradient(ellipse 70% 55% at 72% 42%,rgba(224,107,26,calc(.045 + var(--pulse)*.04)),transparent 70%);animation:signalGridPulse 7.5s ease-in-out infinite}
+.signal-field>.hero-main,.signal-field>.hero-kicker,.signal-field>.signal-readout,.signal-field>.signal-status,.signal-field>.signal-pulse{z-index:2}
+.signal-field>.signal-pulse{z-index:0}
+/* Soften Longhorn-era text-shadow now that mark is gone */
+.hero-main h1,.hero-main h1 em{text-shadow:0 2px 14px rgba(20,18,16,.7)}.hero-main>p{text-shadow:0 1px 10px rgba(20,18,16,.65)}
+@keyframes signalScan{0%{top:-8%;opacity:0}12%{opacity:.85}50%{top:92%;opacity:.55}88%{opacity:.2}100%{top:108%;opacity:0}}
+@keyframes signalGridPulse{0%,100%{--pulse:0}50%{--pulse:1}}
+@media (max-width:720px){
+  .signal-scan{animation:none;opacity:.22;top:38%;height:28px}
+  .signal-field{animation:none;--pulse:.35}
+}
+@media (prefers-reduced-motion:reduce){
+  .signal-scan,.signal-field{animation:none}
+  .signal-scan{opacity:.18;top:42%}
+  .signal-field{--pulse:.25}
+}
