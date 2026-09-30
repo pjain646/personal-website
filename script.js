@@ -91,7 +91,7 @@ if (reduceMotion) {
       });
     });
   };
-  const armHeroEntrance = () => setTimeout(playHeroEntrance, 220);
+  const armHeroEntrance = () => setTimeout(playHeroEntrance, 420);
   if (document.readyState === 'complete') armHeroEntrance();
   else window.addEventListener('load', armHeroEntrance, { once: true });
   const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
