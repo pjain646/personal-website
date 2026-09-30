@@ -126,6 +126,10 @@
 .project.reveal.visible.active,
 .project.reveal.visible:hover,
 .project.reveal.visible:focus-within{opacity:1}
+/* Snap back once .visible is removed (element is off screen) so the next
+   entrance always starts at opacity 0 and the rise offset. */
+.reveal:not(.visible),
+.project.reveal:not(.visible){transition:none}
 @media (max-width:720px){
   .about-portrait.reveal,
   .about-portrait.reveal.visible{transform:none}

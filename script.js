@@ -81,25 +81,43 @@ if (reduceMotion) {
   if (projectPreview) projectPreview.style.setProperty('--reveal-delay', '160ms');
   const heroReveals = [...document.querySelectorAll('.hero .reveal')];
   const heroRevealSet = new Set(heroReveals);
+  let heroArmed = false;
+  // Enter a bit inside the viewport. Leave only once the element is fully
+  // outside, then drop .visible so the next pass starts from opacity 0 / translateY.
+  const showObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (!entry.isIntersecting || heroRevealSet.has(entry.target)) return;
+    entry.target.classList.add('visible');
+  }), { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+  const heroShowObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (!entry.isIntersecting || !heroArmed) return;
+    entry.target.classList.add('visible');
+  }), { threshold: 0.18 });
+  const hideObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (entry.isIntersecting) return;
+    entry.target.classList.remove('visible');
+  }), { threshold: 0 });
+  reveals.forEach(element => {
+    hideObserver.observe(element);
+    (heroRevealSet.has(element) ? heroShowObserver : showObserver).observe(element);
+  });
   // A double rAF from parse time runs during the reload flash, so the rise
   // is finished before the first frame on screen. Wait until load has painted,
-  // hold the hidden state for a beat, then start the stagger.
+  // hold the hidden state for a beat, then start the stagger. Later passes
+  // replay from the hero observer once this first entrance is armed.
   const playHeroEntrance = () => {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        heroReveals.forEach(element => element.classList.add('visible'));
+        heroArmed = true;
+        heroReveals.forEach(element => {
+          const rect = element.getBoundingClientRect();
+          if (rect.bottom > 0 && rect.top < innerHeight) element.classList.add('visible');
+        });
       });
     });
   };
   const armHeroEntrance = () => setTimeout(playHeroEntrance, 420);
   if (document.readyState === 'complete') armHeroEntrance();
   else window.addEventListener('load', armHeroEntrance, { once: true });
-  const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
-    if (!entry.isIntersecting) return;
-    entry.target.classList.add('visible');
-    revealObserver.unobserve(entry.target);
-  }), { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
-  reveals.forEach(element => { if (!heroRevealSet.has(element)) revealObserver.observe(element); });
 }
 window.addEventListener('scroll', () => header.classList.toggle('scrolled', scrollY > 10), { passive: true });
 
