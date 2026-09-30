@@ -80,6 +80,11 @@ if (reduceMotion) {
   const projectPreview = document.querySelector('.project-preview.reveal');
   if (projectPreview) projectPreview.style.setProperty('--reveal-delay', '160ms');
   const heroReveals = new Set(document.querySelectorAll('.hero .reveal'));
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      heroReveals.forEach(element => element.classList.add('visible'));
+    });
+  });
   const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
     if (!entry.isIntersecting) return;
     entry.target.classList.add('visible');
