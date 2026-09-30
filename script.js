@@ -67,7 +67,40 @@ document.querySelectorAll('.project').forEach(project => {
 });
 const sections = [...document.querySelectorAll('main section[id], footer[id]')]; const links = [...nav.querySelectorAll('a')];
 const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) links.forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${entry.target.id}`)); }), { rootMargin: '-35% 0px -55% 0px' }); sections.forEach(section => observer.observe(section));
-const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } }), { threshold: .12 }); document.querySelectorAll('.reveal').forEach(element => revealObserver.observe(element));
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reveals = [...document.querySelectorAll('.reveal')];
+if (reduceMotion) {
+  reveals.forEach(element => element.classList.add('visible'));
+} else {
+  document.querySelectorAll('.reveal-stagger').forEach(group => {
+    [...group.children].filter(element => element.classList.contains('reveal')).forEach((element, index) => {
+      element.style.setProperty('--reveal-delay', `${index * 90}ms`);
+    });
+  });
+  const projectPreview = document.querySelector('.project-preview.reveal');
+  if (projectPreview) projectPreview.style.setProperty('--reveal-delay', '160ms');
+  const heroReveals = [...document.querySelectorAll('.hero .reveal')];
+  const heroRevealSet = new Set(heroReveals);
+  // A double rAF from parse time runs during the reload flash, so the rise
+  // is finished before the first frame on screen. Wait until load has painted,
+  // hold the hidden state for a beat, then start the stagger.
+  const playHeroEntrance = () => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        heroReveals.forEach(element => element.classList.add('visible'));
+      });
+    });
+  };
+  const armHeroEntrance = () => setTimeout(playHeroEntrance, 420);
+  if (document.readyState === 'complete') armHeroEntrance();
+  else window.addEventListener('load', armHeroEntrance, { once: true });
+  const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('visible');
+    revealObserver.unobserve(entry.target);
+  }), { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+  reveals.forEach(element => { if (!heroRevealSet.has(element)) revealObserver.observe(element); });
+}
 window.addEventListener('scroll', () => header.classList.toggle('scrolled', scrollY > 10), { passive: true });
 
 const metrics = document.querySelectorAll('[data-count]');
