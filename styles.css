@@ -65,30 +65,30 @@
 /* Each work row gets a small visual cue for the kind of work it represents. */
 .thread-entry{grid-template-columns:60px minmax(0,1fr) minmax(240px,280px)}.thread-side{display:flex;align-items:center;justify-content:flex-end;gap:18px;min-width:0}.thread-side .thread-role{white-space:nowrap}.thread-visual{width:58px;height:28px;position:relative;display:block;flex:none;opacity:.42;transition:opacity .25s}.thread-visual:before{content:"";position:absolute;left:6px;right:6px;top:50%;height:1px;background:var(--line);transition:background .25s}.thread-visual i{position:absolute;z-index:1;width:7px;height:7px;border:1px solid var(--muted);background:var(--bg);transition:transform .28s,border-color .25s,background .25s}.thread-visual i:nth-child(1){left:4px;top:10px}.thread-visual i:nth-child(2){left:25px;top:10px}.thread-visual i:nth-child(3){right:4px;top:10px}.thread-entry:hover .thread-visual,.thread-entry.active .thread-visual{opacity:1}.thread-entry:hover .thread-visual:before,.thread-entry.active .thread-visual:before{background:var(--accent)}.thread-entry:hover .thread-visual i,.thread-entry.active .thread-visual i{border-color:var(--accent);background:var(--accent)}.thread-visual.system i{border-radius:50%}.thread-entry:hover .system i:nth-child(1){transform:translateY(-5px)}.thread-entry:hover .system i:nth-child(3){transform:translateY(5px)}.thread-visual.agent i{border-radius:50%;width:9px;height:9px;top:9px}.thread-visual.agent i:nth-child(1){left:7px}.thread-visual.agent i:nth-child(2){left:25px;transform:scale(1.5)}.thread-visual.agent i:nth-child(3){right:7px}.thread-entry:hover .agent i:nth-child(2){transform:scale(1.9);box-shadow:0 0 0 4px rgba(224,107,26,.14)}.thread-visual.production:before{top:4px;bottom:4px;left:8px;right:8px;height:auto;background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 16px)}.thread-visual.production i{width:11px;height:16px;top:6px}.thread-visual.production i:nth-child(1){left:4px}.thread-visual.production i:nth-child(2){left:24px}.thread-visual.production i:nth-child(3){right:4px}.thread-entry:hover .production i{transform:translateY(-3px)}.thread-visual.discovery i{width:11px;height:11px;top:8px;transform:rotate(45deg)}.thread-visual.discovery i:nth-child(1){left:4px}.thread-visual.discovery i:nth-child(2){left:24px}.thread-visual.discovery i:nth-child(3){right:4px}.thread-entry:hover .discovery i:nth-child(2){transform:rotate(45deg) scale(1.5)}.thread-visual.community:before{left:16px;right:16px;width:26px;height:26px;top:1px;border:1px solid var(--line);border-radius:50%;background:none}.thread-visual.community i{border-radius:50%}.thread-visual.community i:nth-child(1){left:6px;top:11px}.thread-visual.community i:nth-child(2){left:25px;top:1px}.thread-visual.community i:nth-child(3){right:6px;top:11px}.thread-entry:hover .community i:nth-child(1){transform:translate(-3px,3px)}.thread-entry:hover .community i:nth-child(3){transform:translate(3px,3px)}@media(max-width:720px){.thread-entry{grid-template-columns:28px 1fr}.thread-side{grid-column:2;justify-content:flex-start}.thread-visual{display:none}}
 
-/* Hero breathing amber glow: clearly visible soft radial wash behind content. */
+/* Drifting amber spotlight across the hero grid. No breathing pulse. */
 .longhorn-reveal{display:none!important}
 .signal-pulse{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.hero-glow{
-  --glow-x:-20%;
+.hero-spotlight{
   position:absolute;
-  left:18%;
-  top:42%;
-  width:min(78vw,860px);
-  height:min(62vh,520px);
-  transform:translate(var(--glow-x),-50%) scale(.9);
+  left:-4%;
+  top:10%;
+  width:min(56vw,640px);
+  height:min(48vh,420px);
   border-radius:50%;
   background:radial-gradient(ellipse at center,
-    rgba(201,121,63,.34) 0%,
-    rgba(201,121,63,.18) 32%,
-    rgba(201,121,63,.07) 55%,
+    rgba(201,121,63,.4) 0%,
+    rgba(201,121,63,.18) 34%,
+    rgba(201,121,63,.06) 56%,
     transparent 72%);
-  filter:blur(10px);
-  opacity:.78;
-  animation:heroGlowBreath 5.2s ease-in-out infinite;
-  will-change:transform,opacity;
+  filter:blur(12px);
+  opacity:.72;
+  transform:translate3d(6%, 8%, 0);
+  animation:heroSpotlightDrift 16s ease-in-out infinite;
+  transition:opacity .7s ease;
   pointer-events:none;
 }
-/* Dial back previous grid pulse/scan: static warm grid + pointer wash only */
+.signal-field:hover .hero-spotlight{opacity:.96}
+/* Static warm grid + pointer wash. The spotlight drifts on its own layer. */
 .signal-field{
   --pulse:0;
   background-image:
@@ -104,25 +104,76 @@
 .signal-field>.signal-pulse{z-index:0}
 /* Soften Longhorn-era text-shadow now that mark is gone */
 .hero-main h1,.hero-main h1 em{text-shadow:0 2px 14px rgba(20,18,16,.7)}.hero-main>p{text-shadow:0 1px 10px rgba(20,18,16,.65)}
-@keyframes heroGlowBreath{
-  0%,100%{opacity:.52;transform:translate(var(--glow-x),-50%) scale(.88)}
-  50%{opacity:.95;transform:translate(var(--glow-x),-50%) scale(1.1)}
+@keyframes heroSpotlightDrift{
+  0%,100%{transform:translate3d(4%, 10%, 0)}
+  38%{transform:translate3d(92%, -6%, 0)}
+  70%{transform:translate3d(42%, 46%, 0)}
 }
 @media (max-width:720px){
-  .hero-glow{
-    --glow-x:-50%;
-    left:50%;
-    top:40%;
-    width:min(120vw,520px);
-    height:min(55vh,380px);
-    opacity:.7;
-    animation-duration:5.8s;
+  .hero-spotlight{
+    left:-18%;
+    top:12%;
+    width:min(128vw,520px);
+    height:min(46vh,320px);
+    opacity:.6;
+    animation-duration:20s;
   }
+  .signal-field:hover .hero-spotlight{opacity:.78}
 }
 @media (prefers-reduced-motion:reduce){
-  .hero-glow{
+  .hero-spotlight{
     animation:none;
-    opacity:.68;
-    transform:translate(var(--glow-x),-50%) scale(1);
+    opacity:.5;
+    transform:translate3d(28%, 18%, 0);
+  }
+  .signal-field:hover .hero-spotlight{opacity:.5}
+}
+
+/* Clearer project-preview crossfade, with a mild lift and amber edge on hover. */
+.project-preview{
+  transform:scale(1);
+  transform-origin:center center;
+  box-shadow:0 0 0 1px rgba(201,121,63,.16);
+  transition:transform .55s cubic-bezier(.22,.8,.28,1),box-shadow .55s ease;
+}
+.preview-art{
+  opacity:0;
+  transform:scale(.985);
+  z-index:0;
+  transition:opacity .62s ease,transform .68s cubic-bezier(.22,.8,.24,1);
+}
+.preview-art.active{
+  opacity:1;
+  transform:scale(1);
+  z-index:1;
+}
+.project-layout:has(.project:hover) .project-preview,
+.project-layout:has(.project:focus-within) .project-preview,
+.project-preview:hover{
+  transform:scale(1.03) translateY(-4px);
+  box-shadow:
+    0 0 0 1px rgba(201,121,63,.62),
+    0 16px 36px rgba(20,18,16,.42),
+    0 0 28px rgba(201,121,63,.16);
+}
+@media (prefers-reduced-motion:reduce){
+  .preview-art,
+  .preview-art.active,
+  .project-preview,
+  .project-layout:has(.project:hover) .project-preview,
+  .project-layout:has(.project:focus-within) .project-preview,
+  .project-preview:hover{
+    transition:none;
+    animation:none;
+    transform:none;
+  }
+  .preview-art .sentry-shot img,
+  .preview-art .cheetah-shot img,
+  .preview-art .guppi-shot img,
+  .preview-art.stock.active .sentry-shot img,
+  .preview-art.cheetah.active .cheetah-shot img,
+  .preview-art.guppi.active .guppi-shot img{
+    transform:none;
+    transition:none;
   }
 }
