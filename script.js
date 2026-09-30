@@ -79,18 +79,27 @@ if (reduceMotion) {
   });
   const projectPreview = document.querySelector('.project-preview.reveal');
   if (projectPreview) projectPreview.style.setProperty('--reveal-delay', '160ms');
-  const heroReveals = new Set(document.querySelectorAll('.hero .reveal'));
-  requestAnimationFrame(() => {
+  const heroReveals = [...document.querySelectorAll('.hero .reveal')];
+  const heroRevealSet = new Set(heroReveals);
+  // A double rAF from parse time runs during the reload flash, so the rise
+  // is finished before the first frame on screen. Wait until load has painted,
+  // hold the hidden state for a beat, then start the stagger.
+  const playHeroEntrance = () => {
     requestAnimationFrame(() => {
-      heroReveals.forEach(element => element.classList.add('visible'));
+      requestAnimationFrame(() => {
+        heroReveals.forEach(element => element.classList.add('visible'));
+      });
     });
-  });
+  };
+  const armHeroEntrance = () => setTimeout(playHeroEntrance, 220);
+  if (document.readyState === 'complete') armHeroEntrance();
+  else window.addEventListener('load', armHeroEntrance, { once: true });
   const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
     if (!entry.isIntersecting) return;
     entry.target.classList.add('visible');
     revealObserver.unobserve(entry.target);
   }), { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
-  reveals.forEach(element => { if (!heroReveals.has(element)) revealObserver.observe(element); });
+  reveals.forEach(element => { if (!heroRevealSet.has(element)) revealObserver.observe(element); });
 }
 window.addEventListener('scroll', () => header.classList.toggle('scrolled', scrollY > 10), { passive: true });
 
