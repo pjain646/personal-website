@@ -14,35 +14,27 @@ if (reticle && matchMedia('(hover: hover) and (pointer: fine)').matches) {
   followReticle();
 }
 
-const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sloganWord = document.querySelector('#slogan-word');
 if (sloganWord) {
   const sloganTrack = sloganWord.querySelector('.slogan-track');
   const totalWords = 6;
   const wordWidths = ['3.5ch', '6.8ch', '6.5ch', '5.8ch', '4.4ch', '6.2ch'];
-  const flipMs = reduceMotion ? 0 : 320;
   let sloganIndex = 0;
   let resetting = false;
   const advanceSlogan = () => {
     if (resetting) return;
     sloganIndex += 1;
     sloganWord.style.setProperty('--slogan-width', wordWidths[sloganIndex % totalWords]);
-    sloganTrack.style.transition = reduceMotion ? 'none' : '';
-    if (!reduceMotion) {
-      sloganWord.classList.remove('is-flipping');
-      void sloganTrack.offsetWidth;
-      sloganWord.classList.add('is-flipping');
-    }
+    sloganTrack.style.transition = '';
     sloganTrack.style.transform = `translateY(-${sloganIndex}em)`;
     if (sloganIndex === totalWords) {
       resetting = true;
       setTimeout(() => {
-        sloganWord.classList.remove('is-flipping');
         sloganTrack.style.transition = 'none';
         sloganTrack.style.transform = 'translateY(0)';
         sloganIndex = 0;
-        requestAnimationFrame(() => { sloganTrack.style.transition = reduceMotion ? 'none' : ''; resetting = false; });
-      }, flipMs);
+        requestAnimationFrame(() => { sloganTrack.style.transition = ''; resetting = false; });
+      }, 240);
     }
   };
   sloganWord.addEventListener('mouseenter', advanceSlogan);
@@ -75,7 +67,37 @@ document.querySelectorAll('.project').forEach(project => {
 });
 const sections = [...document.querySelectorAll('main section[id], footer[id]')]; const links = [...nav.querySelectorAll('a')];
 const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) links.forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${entry.target.id}`)); }), { rootMargin: '-35% 0px -55% 0px' }); sections.forEach(section => observer.observe(section));
-const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } }), { threshold: .12 }); document.querySelectorAll('.reveal').forEach(element => revealObserver.observe(element));
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reveals = [...document.querySelectorAll('.reveal')];
+if (reduceMotion) {
+  reveals.forEach(element => element.classList.add('visible'));
+} else {
+  document.querySelectorAll('.reveal-stagger').forEach(group => {
+    [...group.children].filter(element => element.classList.contains('reveal')).forEach((element, index) => {
+      element.style.setProperty('--reveal-delay', `${index * 90}ms`);
+    });
+  });
+  document.querySelectorAll('.hero .reveal').forEach((element, index) => {
+    element.style.setProperty('--reveal-delay', `${index * 90}ms`);
+  });
+  const projectPreview = document.querySelector('.project-preview.reveal');
+  if (projectPreview) projectPreview.style.setProperty('--reveal-delay', '160ms');
+  const heroReveals = new Set(document.querySelectorAll('.hero .reveal'));
+  let heroStarted = false;
+  const startHero = () => {
+    if (heroStarted) return;
+    heroStarted = true;
+    heroReveals.forEach(element => element.classList.add('visible'));
+  };
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(startHero);
+  setTimeout(startHero, 700);
+  const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('visible');
+    revealObserver.unobserve(entry.target);
+  }), { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+  reveals.forEach(element => { if (!heroReveals.has(element)) revealObserver.observe(element); });
+}
 window.addEventListener('scroll', () => header.classList.toggle('scrolled', scrollY > 10), { passive: true });
 
 const metrics = document.querySelectorAll('[data-count]');
@@ -100,27 +122,11 @@ if (thread && principle) {
   };
   const entryObserver = new IntersectionObserver(items => items.forEach(item => { if (item.isIntersecting) activateEntry(item.target); }), { threshold: .65 });
   entries.forEach(entry => { entryObserver.observe(entry); entry.addEventListener('mouseenter', () => activateEntry(entry)); });
-}
-const workThreads = [...document.querySelectorAll('.work-thread')];
-const drawThreads = () => {
-  const viewportPoint = innerHeight * .7;
-  workThreads.forEach(item => {
-    if (reduceMotion) {
-      item.style.setProperty('--thread-progress', '100%');
-      item.querySelectorAll('.thread-entry').forEach(entry => entry.classList.add('thread-reached'));
-      return;
-    }
-    const rect = item.getBoundingClientRect();
-    const progress = Math.max(0, Math.min(1, (viewportPoint - rect.top) / Math.max(rect.height, 1)));
-    item.style.setProperty('--thread-progress', `${progress * 100}%`);
-    item.querySelectorAll('.thread-entry').forEach(entry => {
-      const entryRect = entry.getBoundingClientRect();
-      entry.classList.toggle('thread-reached', entryRect.top + entryRect.height * .45 <= viewportPoint);
-    });
-  });
-};
-if (workThreads.length) {
-  addEventListener('scroll', drawThreads, { passive: true });
-  addEventListener('resize', drawThreads);
-  drawThreads();
+  const drawThread = () => {
+    const rect = thread.getBoundingClientRect();
+    const viewportPoint = innerHeight * .62;
+    const progress = Math.max(0, Math.min(1, (viewportPoint - rect.top) / rect.height));
+    thread.style.setProperty('--thread-progress', `${progress * 100}%`);
+  };
+  addEventListener('scroll', drawThread, { passive: true }); drawThread();
 }

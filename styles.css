@@ -81,92 +81,60 @@
 .signal-field>.signal-status{z-index:2}
 .hero-main h1,.hero-main h1 em{text-shadow:0 2px 14px rgba(20,18,16,.7)}.hero-main>p{text-shadow:0 1px 10px rgba(20,18,16,.65)}
 
-/* Work timeline: a thick amber line that draws down the thread as you scroll. */
-.thread-line{
-  left:-1px;
-  width:4px;
-  background:#3a3631;
-  border-radius:4px;
-  z-index:1;
-}
-.thread-line i{
-  position:relative;
-  height:var(--thread-progress,0%);
-  background:#C9793F;
-  border-radius:4px;
-  box-shadow:0 0 14px rgba(201,121,63,.95),0 0 2px #C9793F;
-  transition:height .12s linear;
-}
-.thread-line i:after{
-  content:"";
-  position:absolute;
-  left:50%;
-  bottom:0;
-  width:14px;
-  height:14px;
-  border-radius:50%;
-  background:#C9793F;
-  transform:translate(-50%,50%);
-  box-shadow:0 0 0 5px rgba(201,121,63,.28),0 0 18px rgba(201,121,63,.9);
-}
-.thread-entry.thread-reached:before{
-  background:#C9793F;
-  border-color:#C9793F;
-  box-shadow:0 0 0 5px rgba(201,121,63,.22);
-}
-
-/* Slogan word flip: a short vertical snap with a blur that clears as the word lands. */
-.slogan-word{transition:width .32s cubic-bezier(.16,.9,.22,1)}
-.slogan-track{transition:transform .32s cubic-bezier(.16,.9,.22,1)}
-.slogan-word.is-flipping .slogan-track{animation:sloganBlurIn .32s ease}
-@keyframes sloganBlurIn{
-  0%{filter:blur(8px)}
-  100%{filter:blur(0)}
-}
-
-/* One obvious project hover: the preview slides in, the shot pans, and an amber border lights up. */
-.project-preview{
-  overflow:hidden;
-  border:2px solid transparent;
-  transition:border-color .3s ease,box-shadow .3s ease;
-}
-.preview-art{
+/* Section entrance: fade and rise, with a short stagger between siblings. */
+.reveal{
   opacity:0;
-  transform:translateX(72px);
-  z-index:0;
-  transition:opacity .4s ease,transform .45s cubic-bezier(.16,.84,.24,1);
+  transform:none;
+  translate:0 40px;
+  scale:.98;
+  transition:
+    opacity .8s cubic-bezier(.16,1,.3,1),
+    translate .8s cubic-bezier(.16,1,.3,1),
+    scale .8s cubic-bezier(.16,1,.3,1);
+  transition-delay:var(--reveal-delay,0ms);
 }
-.preview-art.active{
+.reveal.visible{
   opacity:1;
-  transform:translateX(0);
-  z-index:1;
+  transform:none;
+  translate:0 0;
+  scale:1;
 }
-.project-layout:has(.project:hover) .project-preview,
-.project-layout:has(.project:focus-within) .project-preview{
-  border-color:#C9793F;
-  box-shadow:0 0 0 1px #C9793F,0 0 26px rgba(201,121,63,.7);
+.about-portrait.reveal,
+.about-portrait.reveal.visible{transform:translateX(24px)}
+.project.reveal{transition:opacity .8s cubic-bezier(.16,1,.3,1),translate .8s cubic-bezier(.16,1,.3,1),scale .8s cubic-bezier(.16,1,.3,1)}
+.project.reveal:not(.visible){opacity:0}
+.project.reveal.visible{opacity:.5}
+.project.reveal.visible.active,
+.project.reveal.visible:hover,
+.project.reveal.visible:focus-within{opacity:1}
+@media (max-width:720px){
+  .about-portrait.reveal,
+  .about-portrait.reveal.visible{transform:none}
 }
-.preview-art.stock .sentry-shot img,
-.preview-art.cheetah .cheetah-shot img,
-.preview-art.guppi .guppi-shot img{
-  transform:scale(1.16) translateX(5%);
-  transition:transform .7s cubic-bezier(.16,.84,.24,1);
-}
-.preview-art.stock.active .sentry-shot img,
-.preview-art.cheetah.active .cheetah-shot img,
-.preview-art.guppi.active .guppi-shot img{
-  transform:scale(1.16) translateX(-5%);
-}
-
 @media (prefers-reduced-motion:reduce){
-  .thread-line i{height:100%!important;transition:none!important}
-  .thread-entry:before{background:#C9793F;border-color:#C9793F}
-  .slogan-word,.slogan-track{transition:none!important;animation:none!important;filter:none!important}
-  .preview-art,.preview-art.active{transition:none;transform:none}
-  .preview-art.stock .sentry-shot img,
-  .preview-art.cheetah .cheetah-shot img,
-  .preview-art.guppi .guppi-shot img,
-  .preview-art.stock.active .sentry-shot img,
-  .preview-art.cheetah.active .cheetah-shot img,
-  .preview-art.guppi.active .guppi-shot img{transform:none;transition:none}
+  .reveal,
+  .reveal.visible{
+    opacity:1;
+    translate:none;
+    scale:none;
+    transition:none;
+    transform:none;
+  }
+  .project.reveal,
+  .project.reveal:not(.visible),
+  .project.reveal.visible{
+    opacity:.5;
+    translate:none;
+    scale:none;
+    transition:none;
+  }
+  .project.reveal.active,
+  .project.reveal:hover,
+  .project.reveal:focus-within{opacity:1}
+  .about-portrait.reveal,
+  .about-portrait.reveal.visible{transform:translateX(24px)}
+}
+@media (prefers-reduced-motion:reduce) and (max-width:720px){
+  .about-portrait.reveal,
+  .about-portrait.reveal.visible{transform:none}
 }
