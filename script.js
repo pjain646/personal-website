@@ -14,27 +14,35 @@ if (reticle && matchMedia('(hover: hover) and (pointer: fine)').matches) {
   followReticle();
 }
 
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sloganWord = document.querySelector('#slogan-word');
 if (sloganWord) {
   const sloganTrack = sloganWord.querySelector('.slogan-track');
   const totalWords = 6;
   const wordWidths = ['3.5ch', '6.8ch', '6.5ch', '5.8ch', '4.4ch', '6.2ch'];
+  const flipMs = reduceMotion ? 0 : 320;
   let sloganIndex = 0;
   let resetting = false;
   const advanceSlogan = () => {
     if (resetting) return;
     sloganIndex += 1;
     sloganWord.style.setProperty('--slogan-width', wordWidths[sloganIndex % totalWords]);
-    sloganTrack.style.transition = '';
+    sloganTrack.style.transition = reduceMotion ? 'none' : '';
+    if (!reduceMotion) {
+      sloganWord.classList.remove('is-flipping');
+      void sloganTrack.offsetWidth;
+      sloganWord.classList.add('is-flipping');
+    }
     sloganTrack.style.transform = `translateY(-${sloganIndex}em)`;
     if (sloganIndex === totalWords) {
       resetting = true;
       setTimeout(() => {
+        sloganWord.classList.remove('is-flipping');
         sloganTrack.style.transition = 'none';
         sloganTrack.style.transform = 'translateY(0)';
         sloganIndex = 0;
-        requestAnimationFrame(() => { sloganTrack.style.transition = ''; resetting = false; });
-      }, 240);
+        requestAnimationFrame(() => { sloganTrack.style.transition = reduceMotion ? 'none' : ''; resetting = false; });
+      }, flipMs);
     }
   };
   sloganWord.addEventListener('mouseenter', advanceSlogan);
@@ -92,11 +100,27 @@ if (thread && principle) {
   };
   const entryObserver = new IntersectionObserver(items => items.forEach(item => { if (item.isIntersecting) activateEntry(item.target); }), { threshold: .65 });
   entries.forEach(entry => { entryObserver.observe(entry); entry.addEventListener('mouseenter', () => activateEntry(entry)); });
-  const drawThread = () => {
-    const rect = thread.getBoundingClientRect();
-    const viewportPoint = innerHeight * .62;
-    const progress = Math.max(0, Math.min(1, (viewportPoint - rect.top) / rect.height));
-    thread.style.setProperty('--thread-progress', `${progress * 100}%`);
-  };
-  addEventListener('scroll', drawThread, { passive: true }); drawThread();
+}
+const workThreads = [...document.querySelectorAll('.work-thread')];
+const drawThreads = () => {
+  const viewportPoint = innerHeight * .7;
+  workThreads.forEach(item => {
+    if (reduceMotion) {
+      item.style.setProperty('--thread-progress', '100%');
+      item.querySelectorAll('.thread-entry').forEach(entry => entry.classList.add('thread-reached'));
+      return;
+    }
+    const rect = item.getBoundingClientRect();
+    const progress = Math.max(0, Math.min(1, (viewportPoint - rect.top) / Math.max(rect.height, 1)));
+    item.style.setProperty('--thread-progress', `${progress * 100}%`);
+    item.querySelectorAll('.thread-entry').forEach(entry => {
+      const entryRect = entry.getBoundingClientRect();
+      entry.classList.toggle('thread-reached', entryRect.top + entryRect.height * .45 <= viewportPoint);
+    });
+  });
+};
+if (workThreads.length) {
+  addEventListener('scroll', drawThreads, { passive: true });
+  addEventListener('resize', drawThreads);
+  drawThreads();
 }
